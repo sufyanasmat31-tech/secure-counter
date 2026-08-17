@@ -1,0 +1,43 @@
+[package]
+name = "secure-counter"
+version = "0.1.0"
+edition = "2021"
+description = "Bounds-checked, persistent counter — supply-chain-auditable release binary"
+license = "MIT"
+
+[dependencies]
+# CLI argument parsing with compile-time derive macros
+clap = { version = "4", features = ["derive"] }
+
+# Ergonomic custom error types (no manual Display boilerplate)
+thiserror = "1"
+
+# Structured, levelled logging façade
+tracing = "0.1"
+
+# Subscriber that formats tracing events to stderr
+tracing-subscriber = { version = "0.3", features = ["env-filter"] }
+
+# ─── Release profile — maximum security & minimum latency ────────────────────
+[profile.release]
+# Full optimisation; compiler may inline across function boundaries
+opt-level = 3
+
+# Link-Time Optimisation: whole-program dead-code elimination across crates
+lto = true
+
+# Single codegen unit lets LLVM see the entire crate at once (required for LTO)
+codegen-units = 1
+
+# Abort on panic instead of unwinding — smaller binary, no panic handler attack surface
+panic = "abort"
+
+# Strip debug symbols from the final binary (reduces size, removes symbol leakage)
+strip = true
+# ─────────────────────────────────────────────────────────────────────────────
+
+# cargo-auditable embeds a compressed JSON manifest of all dependency versions
+# directly into the .rodata section of the binary so `cargo audit bin` can
+# scan the shipped artifact — no source tree required.
+[package.metadata.auditable]
+enabled = true

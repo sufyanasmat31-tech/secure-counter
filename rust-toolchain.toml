@@ -1,0 +1,6 @@
+[toolchain]
+# Pin the exact toolchain so every developer and every CI run
+# produces an identical build — no "works on my machine" drift.
+channel = "stable-x86_64-pc-windows-gnu"
+components = ["rustfmt", "clippy"]
+targets = ["x86_64-pc-windows-gnu"]
